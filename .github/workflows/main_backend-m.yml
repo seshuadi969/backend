@@ -1,31 +1,40 @@
-name: Build and deploy FastAPI app to Azure Web App
+name: Deploy FastAPI App to Azure WebApp
 
 on:
   push:
     branches:
-      - main
+      - main   # 👈 change if your deploy branch is different
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout repo
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      # Step 2: Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # or your version
+          python-version: '3.11'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      # Step 4: Login to Azure using Service Principal
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 5: Deploy to Azure WebApp
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: backend-m   # change this
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          app-name: backend-m    # 👈 replace with your Web App name
           package: .
