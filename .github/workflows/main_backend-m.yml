@@ -3,22 +3,22 @@ name: Deploy FastAPI App to Azure WebApp
 on:
   push:
     branches:
-      - main   # 👈 change if your deploy branch is different
+      - main  # Change if your deploy branch is different
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo
+      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Setup Python
+      # Step 2: Setup Python environment
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.11'  # Change the version if necessary
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -30,11 +30,17 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Ensure this secret is set in your repository
 
-      # Step 5: Deploy to Azure WebApp
+      # Step 5: Set the startup command for FastAPI using Gunicorn
+      - name: Set Startup Command
+        run: |
+          echo "gunicorn -w 4 -b 0.0.0.0:8000 app.main:app" > .azure/startup.txt
+
+      # Step 6: Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: backend-m    # 👈 replace with your Web App name
-          package: .
+          app-name: backend-m  # Replace with your Azure Web App name
+          package: ./app       # Deploy the 'app' subfolder since your FastAPI app is located there
+
