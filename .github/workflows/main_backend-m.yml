@@ -32,15 +32,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}  # Ensure this secret is set in your repository
 
-      # Step 5: Set the startup command for FastAPI using Gunicorn
-      - name: Set Startup Command
-        run: |
-          echo "gunicorn -w 4 -b 0.0.0.0:8000 app.main:app" > .azure/startup.txt
-
-      # Step 6: Deploy to Azure Web App
+      # Step 5: Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: backend-m  # Replace with your Azure Web App name
           package: ./app       # Deploy the 'app' subfolder since your FastAPI app is located there
 
+     
